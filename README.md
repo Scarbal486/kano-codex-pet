@@ -8,7 +8,7 @@ The repository remains private during production. It must not be made public unt
 
 ## Preview
 
-Approved contact sheets, direction checks, and animation previews will be added under `assets/` as production passes visual review.
+Approved contact sheets, direction checks, and animation previews are under `assets/`.
 
 ## Install
 
@@ -19,6 +19,15 @@ The installable files are under `dist/`. Copy `pet.json` and `spritesheet.webp` 
 ```
 
 Then refresh or restart Codex and select `鹿乃 / Kano` in Settings -> Pets.
+
+On Codex `26.721.11231.0`, the tested flow is:
+
+1. Open Settings -> Pets.
+2. Use Refresh if the custom entry is not visible yet.
+3. Select `鹿乃 / Kano`.
+4. Choose Wake pet.
+
+The package was installed and selected successfully on Windows on 2026-08-01. Codex intentionally gives idle frames long dwell times; the 10 FPS direction preview under `assets/previews/` is a visual QA loop, not the application's idle playback rate.
 
 ## Package
 

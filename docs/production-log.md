@@ -53,15 +53,43 @@ Status: All nine standard rows approved
 
 ## Look directions
 
-Status: Not started
+Status: Approved
+
+- The user approved the four cardinal anchors and the final coherent 16-direction candidate on 2026-08-01.
+- Approved source: `work/runs/kano--scarbal486-v2/decoded/look-directions-16-built-in-edit-v2.png`.
+- Both complete 8-pose rows came from the same 2 x 8 generation. The rows were split only at the pure-green separator and registered at scale `0.6`; no cell patching, mirroring, candidate mixing, or post-generation enlargement was used.
+- Row 9 contains `000` through `157.5`; row 10 contains `180` through `337.5`, in clockwise 22.5-degree increments.
+- Automatic continuity QA reports `ok: true` and `reviewRequired: true`. The user reviewed and accepted the labeled QA sheet and the 10 FPS loop; `reviewRequired` is retained as an automatic warning, not rewritten as an automatic pass.
+- The critical row boundary `157.5 -> 180` measures 2560 differing pixels, 0.71 px center shift, and 1.042 area ratio. The loop boundary `337.5 -> 000` measures 2821 differing pixels, 4.47 px center shift, and 1.111 area ratio.
+- Alpha-hole warnings were visually reviewed as the natural gaps around the forked antlers and hair contours, with no visible torso or costume hole.
+- Repository QA outputs: `assets/look-directions.png` and `assets/previews/look-directions.gif`.
+- Formal jobs `look-cardinals`, `look-row-9`, and `look-row-10` are marked `complete` in the ignored production manifest.
 
 ## Validation
 
-Status: Not started
+Status: Passed
+
+- The single authorized chroma-despill pass completed with `ok: true`, preserved alpha, changed 130752 pixels, and rejected 0 pixels. No second despill pass was run.
+- Final package atlas: `dist/spritesheet.webp`, WebP RGBA, 1536 x 2288, 8 columns x 11 rows, 192 x 208 cells, Codex Pet v2.
+- Deterministic validation passed with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels.
+- Manifest: `dist/pet.json`; validation report: `dist/validation.json`; final visual audit sheet: `assets/contact-sheet.png`.
+- SHA-256 `dist/pet.json`: `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`.
+- SHA-256 `dist/spritesheet.webp`: `5659ADAFDE27668D84FF4BE9696AD9A35FBB485D0FDA27684D375D827A7B36CA`.
+- SHA-256 `dist/validation.json`: `4792A8CACE46949762D9B9E88F3F5B5C61BDB79093ECB78F936DBC217C447A14`.
 
 ## Runtime smoke test
 
-Status: Not started
+Status: Selection, load, render, and idle-loop checks passed; unlocked pointer/state sweep pending
+
+- Installed to `C:\Users\W\.codex\pets\kano--scarbal486` on 2026-08-01. Installed `pet.json` and `spritesheet.webp` hashes exactly match `dist/`.
+- Tested application: Codex `26.721.11231.0` on Windows.
+- Settings -> Pets discovered `鹿乃 / Kano` without an application restart. The custom preview was nonblank, correctly scaled, and free of an opaque green background.
+- `鹿乃 / Kano` was selected successfully; the built-in `Codex` entry returned to an available state. Invoking `Wake pet` created a visible 408 x 400 Codex auxiliary window.
+- Runtime accessibility identified the rendered node as `鹿乃 / Kano 宠物` with a 113 x 122 on-screen bound, matching the configured 112 px mascot width. The rendered character was complete, not clipped, and had no pure-green pixels.
+- A 5.318-second runtime sample at approximately 10 Hz captured 50 window frames, 5 distinct pet frames, and 4 idle transitions. The observed transition intervals match Codex's fixed idle pacing.
+- Codex `26.721.11231.0` deliberately multiplies the idle-row dwell times by 6: `[1680, 660, 660, 840, 840, 1920] ms`. The slow idle impression is therefore host playback policy, not missing atlas frames or the 10 FPS direction-review GIF.
+- The Windows session was on the lock screen during the smoke test. UI Automation could select and wake the pet, but the secure desktop did not forward pointer motion to the user-desktop overlay. Pointer-look switching and a live trigger sweep of every non-idle state are therefore not claimed as passed.
+- Ignored evidence remains under `work/runs/kano--scarbal486-v2/qa/`, including settings, pet-window, frame-sampling, and runtime-code captures.
 
 ## Release
 
