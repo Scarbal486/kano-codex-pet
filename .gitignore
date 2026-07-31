@@ -1,0 +1,14 @@
+# Local reference images are not licensed for redistribution.
+/*.gif
+/references/
+
+# Local production and review artifacts.
+/.superpowers/
+/work/
+/generated/
+/generated_images/
+
+# OS metadata.
+Thumbs.db
+.DS_Store
+
