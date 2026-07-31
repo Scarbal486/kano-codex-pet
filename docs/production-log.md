@@ -19,7 +19,14 @@ Status: Production run prepared
 
 ## Canonical model
 
-Status: Not started
+Status: Approved
+
+- Approved candidate: A, confirmed by the user on 2026-07-31.
+- Source bytes: `work/runs/kano--scarbal486-v2/decoded/base-built-in.png`
+- Canonical runtime copy: `work/runs/kano--scarbal486-v2/decoded/base.png`
+- Canonical reference copy: `work/runs/kano--scarbal486-v2/references/canonical-base.png`
+- Repository model sheet: `assets/model-sheet.png`
+- QA: identity, bow side, antlers, scarf, dotted green clothing, deep-blue eyes, and 192 x 208 readability reviewed and approved. Background variation remains assigned to the deterministic chroma pipeline.
 
 ## Standard rows
 
