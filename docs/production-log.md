@@ -47,6 +47,9 @@ Status: All nine standard rows approved
 - `review`: 6 frames from `decoded/review-built-in.png`; forward lean, side-to-side gaze, narrowed eyes, head tilt, and understanding reset without added props; `components` extraction; zero QA errors or warnings.
 - The four Task 6 built-in results were decoded directly from `payload.result` Base64 at JSONL lines 2502, 2541, 2561, and 2582 respectively. All four first-pass rows passed, so the Shoubanhua fallback was not used.
 - Additional approved previews: `assets/previews/failed.gif`, `waiting.gif`, `running.gif`, and `review.gif`.
+- Combined standard-row QA: all nine rows were extracted together and inspected with zero errors. Eight rows use component extraction; `jumping` uses the approved stable-slot override to preserve vertical travel and retains one expected warning.
+- Intermediate atlas: 1536 x 1872 RGBA WebP at `work/runs/kano--scarbal486-v2/final/spritesheet.webp`. It is QA-only and is not copied to `dist/`.
+- Contact-sheet verdict: all frame counts, directions, state semantics, identity traits, safe padding, scale continuity, and animation loops passed manual review. The final combined-run previews replace the earlier incremental copies under `assets/previews/`.
 
 ## Look directions
 
