@@ -30,7 +30,7 @@ Status: Approved
 
 ## Standard rows
 
-Status: Task 5 approved; Task 6 not started
+Status: All nine standard rows approved
 
 - User-approved processing rule: a selected multi-pose grid may be reordered deterministically in reading order when every pose comes from the same generation. Reordering does not redraw, mirror, rescale, or mix candidates.
 - `idle`: 6 frames from `decoded/idle-shoubanhua-wide-v2.png`; final strip `decoded/idle.png`; `components` extraction; zero QA errors or warnings.
@@ -41,6 +41,12 @@ Status: Task 5 approved; Task 6 not started
 - Built-in image results for `running-left`, `waving`, and `jumping` were decoded directly from the `payload.result` Base64 bytes in `C:\Users\W\.codex\sessions\2026\07\31\rollout-2026-07-31T14-40-24-019fb6e7-1377-73e3-8bc3-5f30cbbf6bee.jsonl`; no screenshot reconstruction was used.
 - Rejected candidates remain only in the ignored run directory. In particular, the first two Shoubanhua left-running grids were rejected for wrong-direction poses, missing frames, and overlap.
 - Approved previews: `assets/previews/idle.gif`, `running-right.gif`, `running-left.gif`, `waving.gif`, and `jumping.gif`.
+- `failed`: 8 frames from `decoded/failed-built-in.png`; confusion, attached tears, drooping posture, and a deflated crouch; `components` extraction; zero QA errors or warnings.
+- `waiting`: 6 frames from `decoded/waiting-built-in.png`; hands-together asking motion and expectant gaze remain distinct from idle; `components` extraction; zero QA errors or warnings.
+- `running`: 6 frames from `decoded/running-built-in.png`; seated active-task loop with one consistent pink handheld device and no locomotion; `components` extraction; zero QA errors or warnings.
+- `review`: 6 frames from `decoded/review-built-in.png`; forward lean, side-to-side gaze, narrowed eyes, head tilt, and understanding reset without added props; `components` extraction; zero QA errors or warnings.
+- The four Task 6 built-in results were decoded directly from `payload.result` Base64 at JSONL lines 2502, 2541, 2561, and 2582 respectively. All four first-pass rows passed, so the Shoubanhua fallback was not used.
+- Additional approved previews: `assets/previews/failed.gif`, `waiting.gif`, `running.gif`, and `review.gif`.
 
 ## Look directions
 
