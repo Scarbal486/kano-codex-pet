@@ -30,7 +30,17 @@ Status: Approved
 
 ## Standard rows
 
-Status: Not started
+Status: Task 5 approved; Task 6 not started
+
+- User-approved processing rule: a selected multi-pose grid may be reordered deterministically in reading order when every pose comes from the same generation. Reordering does not redraw, mirror, rescale, or mix candidates.
+- `idle`: 6 frames from `decoded/idle-shoubanhua-wide-v2.png`; final strip `decoded/idle.png`; `components` extraction; zero QA errors or warnings.
+- `running-right`: 8 frames from `decoded/running-right-shoubanhua-wide-v2.png`; deterministically reordered to `decoded/running-right.png`; `components` extraction; zero QA errors or warnings; all frame hashes are distinct.
+- `running-left`: 8 frames from `decoded/running-left-built-in-grid.png`; deterministically reordered to `decoded/running-left.png`; generated independently and never mirrored; `components` extraction; zero QA errors or warnings; all frame hashes are distinct.
+- `waving`: 4 frames from `decoded/waving-built-in.png`; final strip `decoded/waving.png`; `components` extraction; zero QA errors or warnings.
+- `jumping`: 5 frames from `decoded/jumping-built-in.png`; final strip `decoded/jumping.png`; `stable-slots` extraction intentionally preserves the generated jump height. Manual review confirmed the crouch, ascent, apex, descent, and landing remain stable and unclipped.
+- Built-in image results for `running-left`, `waving`, and `jumping` were decoded directly from the `payload.result` Base64 bytes in `C:\Users\W\.codex\sessions\2026\07\31\rollout-2026-07-31T14-40-24-019fb6e7-1377-73e3-8bc3-5f30cbbf6bee.jsonl`; no screenshot reconstruction was used.
+- Rejected candidates remain only in the ignored run directory. In particular, the first two Shoubanhua left-running grids were rejected for wrong-direction poses, missing frames, and overlap.
+- Approved previews: `assets/previews/idle.gif`, `running-right.gif`, `running-left.gif`, `waving.gif`, and `jumping.gif`.
 
 ## Look directions
 
