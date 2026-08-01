@@ -8,7 +8,10 @@
 /generated/
 /generated_images/
 
+# Python bytecode.
+__pycache__/
+*.py[cod]
+
 # OS metadata.
 Thumbs.db
 .DS_Store
-

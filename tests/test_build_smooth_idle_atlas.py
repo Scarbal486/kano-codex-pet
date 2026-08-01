@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageSequence
 
 from scripts.build_smooth_idle_atlas import (
@@ -38,6 +39,28 @@ def make_static_atlas(path: Path) -> Image.Image:
 
     atlas.save(path, format="PNG")
     return atlas
+
+
+def make_complex_static_atlas(path: Path) -> Image.Image:
+    y, x = np.indices((ATLAS_SIZE[1], ATLAS_SIZE[0]), dtype=np.int32)
+    rgba = np.zeros((ATLAS_SIZE[1], ATLAS_SIZE[0], 4), dtype=np.uint8)
+    local_x = x % CELL_SIZE[0]
+    local_y = y % CELL_SIZE[1]
+    visible = (
+        ((local_x - 96) ** 2 + (local_y - 104) ** 2 < 72**2)
+        | ((local_x > 30) & (local_x < 155) & (local_y > 45) & (local_y < 165))
+    )
+    rgba[..., 0][visible] = ((x[visible] * 17 + y[visible] * 3) % 256).astype(np.uint8)
+    rgba[..., 1][visible] = ((x[visible] * 5 + y[visible] * 13) % 256).astype(np.uint8)
+    rgba[..., 2][visible] = ((x[visible] * 11 + y[visible] * 7) % 256).astype(np.uint8)
+    rgba[..., 3][visible] = np.where(
+        ((local_x[visible] + local_y[visible]) % 9) == 0,
+        128,
+        255,
+    ).astype(np.uint8)
+    image = Image.fromarray(rgba, mode="RGBA")
+    image.save(path, format="PNG")
+    return image
 
 
 class BuildSmoothIdleAtlasTest(unittest.TestCase):
@@ -99,6 +122,22 @@ class BuildSmoothIdleAtlasTest(unittest.TestCase):
                 build_smooth_idle_atlas(source_path, output_path)
 
             self.assertEqual(output_path.read_bytes(), b"keep-me")
+
+    def test_complex_transparent_pixels_keep_zero_rgb(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_path = root / "complex.png"
+            output_path = root / "animated.webp"
+            make_complex_static_atlas(source_path)
+
+            result = build_smooth_idle_atlas(source_path, output_path)
+
+            self.assertEqual(result["transparent_rgb_residue_pixels"], 0)
+            with Image.open(output_path) as opened:
+                for frame in ImageSequence.Iterator(opened):
+                    rgba = np.asarray(frame.convert("RGBA"))
+                    transparent = rgba[..., 3] == 0
+                    self.assertTrue(np.all(rgba[..., :3][transparent] == 0))
 
     def test_rejects_animated_source_without_creating_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

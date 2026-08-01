@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import sys
@@ -38,6 +39,69 @@ def _riff_chunks(data: bytes):
             raise AtlasError(f"truncated WebP chunk {name!r}")
         yield name, data[payload_start:payload_end]
         offset = payload_end + (size & 1)
+
+
+def _riff_chunk(name: bytes, payload: bytes) -> bytes:
+    padding = b"\0" if len(payload) & 1 else b""
+    return name + len(payload).to_bytes(4, "little") + payload + padding
+
+
+def _uint24(value: int) -> bytes:
+    return value.to_bytes(3, "little")
+
+
+def _exact_webp_image_chunks(image: Image.Image) -> bytes:
+    encoded = io.BytesIO()
+    image.save(
+        encoded,
+        format="WEBP",
+        lossless=True,
+        quality=100,
+        alpha_quality=100,
+        method=6,
+        exact=True,
+    )
+    chunks = [
+        _riff_chunk(name, payload)
+        for name, payload in _riff_chunks(encoded.getvalue())
+        if name in {b"ALPH", b"VP8 ", b"VP8L"}
+    ]
+    if not chunks:
+        raise AtlasError("exact WebP frame has no image data")
+    return b"".join(chunks)
+
+
+def _animation_frame_chunk(image: Image.Image, duration_ms: int) -> bytes:
+    width, height = image.size
+    header = b"".join(
+        (
+            _uint24(0),
+            _uint24(0),
+            _uint24(width - 1),
+            _uint24(height - 1),
+            _uint24(duration_ms),
+            b"\x02",
+        )
+    )
+    return _riff_chunk(b"ANMF", header + _exact_webp_image_chunks(image))
+
+
+def _save_exact_animation(frames: list[Image.Image], path: Path) -> None:
+    vp8x = b"\x12\0\0\0" + _uint24(ATLAS_WIDTH - 1) + _uint24(
+        ATLAS_HEIGHT - 1
+    )
+    anim = b"\0\0\0\0\0\0"
+    frame_chunks = [_animation_frame_chunk(frames[0], FRAME_DURATION_MS)]
+    frame_chunks.extend(
+        _animation_frame_chunk(
+            frame.crop((0, 0, ATLAS_WIDTH, CELL_HEIGHT)),
+            FRAME_DURATION_MS,
+        )
+        for frame in frames[1:]
+    )
+    body = b"WEBP" + _riff_chunk(b"VP8X", vp8x) + _riff_chunk(b"ANIM", anim)
+    body += b"".join(frame_chunks)
+    path.write_bytes(b"RIFF" + len(body).to_bytes(4, "little") + body)
 
 
 def inspect_animated_webp(path: Path) -> dict[str, object]:
@@ -262,20 +326,7 @@ def build_smooth_idle_atlas(
     os.close(descriptor)
     temporary = Path(temporary_name)
     try:
-        frames[0].save(
-            temporary,
-            format="WEBP",
-            save_all=True,
-            append_images=frames[1:],
-            duration=[FRAME_DURATION_MS] * IDLE_FRAME_COUNT,
-            loop=0,
-            background=(0, 0, 0, 0),
-            lossless=True,
-            quality=100,
-            alpha_quality=100,
-            method=6,
-            minimize_size=True,
-        )
+        _save_exact_animation(frames, temporary)
         del frames
         result = _validate_output(temporary, source)
         result["file"] = str(output_path)
