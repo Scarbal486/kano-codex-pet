@@ -27,7 +27,9 @@ On Codex `26.721.11231.0`, the tested flow is:
 3. Select `鹿乃 / Kano`.
 4. Choose Wake pet.
 
-The package was installed and selected successfully on Windows on 2026-08-01. Codex intentionally gives idle frames long dwell times; the 10 FPS direction preview under `assets/previews/` is a visual QA loop, not the application's idle playback rate.
+The package was installed and selected successfully on Windows on 2026-08-01. The runtime atlas was updated on 2026-08-02 to a lossless six-phase animated WebP: each phase lasts 100 ms, so Kano's approved idle loop renders at 10 FPS even though Codex `26.721.11231.0` gives the host-selected idle columns long dwell times.
+
+This playback fix changes only Kano's custom `spritesheet.webp`. It does not patch Codex, change another pet, or add a timing setting to `pet.json`. A fresh empty-reply `End` caret test also confirmed that the animated atlas still switches to Kano's approved look row without entering or submitting text.
 
 ## Package
 

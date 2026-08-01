@@ -70,12 +70,13 @@ Status: Approved
 Status: Passed
 
 - The single authorized chroma-despill pass completed with `ok: true`, preserved alpha, changed 130752 pixels, and rejected 0 pixels. No second despill pass was run.
-- Final package atlas: `dist/spritesheet.webp`, WebP RGBA, 1536 x 2288, 8 columns x 11 rows, 192 x 208 cells, Codex Pet v2.
-- Deterministic validation passed with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels.
+- Final package atlas: `dist/spritesheet.webp`, lossless animated WebP RGBA, 1536 x 2288, 8 columns x 11 rows, 192 x 208 cells, Codex Pet v2. The file is 2550320 bytes and contains 6 animation frames, each with a 100 ms duration, at 10 FPS with infinite loop value `0`.
+- Deterministic animation validation passed with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels. At animation phase `p`, idle columns 0 through 5 all decode to approved idle source cell `p`; neutral and unused cells and every non-idle row remain pixel-identical to the approved static atlas.
+- All six decoded phases independently passed `validate_atlas.py --require-v2`: each is 1536 x 2288 with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels.
 - Manifest: `dist/pet.json`; validation report: `dist/validation.json`; final visual audit sheet: `assets/contact-sheet.png`.
 - SHA-256 `dist/pet.json`: `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`.
-- SHA-256 `dist/spritesheet.webp`: `5659ADAFDE27668D84FF4BE9696AD9A35FBB485D0FDA27684D375D827A7B36CA`.
-- SHA-256 `dist/validation.json`: `4792A8CACE46949762D9B9E88F3F5B5C61BDB79093ECB78F936DBC217C447A14`.
+- SHA-256 `dist/spritesheet.webp`: `0E4D65565AD672FAA9D91262E4BE3A9B11524EE4F31AFF9FE1C17DB9E79F5296`.
+- SHA-256 `dist/validation.json`: `BB1F32D503A62AB808DC27E77DCE3CB2130BDF815E1B6ECA0AA1AD243ABE8F13`.
 
 ## Runtime smoke test
 
@@ -93,6 +94,20 @@ Status: Selection, load, render, idle-loop, and caret-driven look checks passed;
 - With the reply draft still empty, an `End` selection event caused the editor's `onSelect` path to publish a caret point. A fresh 113 x 122 capture then matched look direction `315` from final atlas row 10, column 6: on 4,413 high-alpha pixels, RGB MAE was `5.359`, median absolute channel error was `0`, and the 90th percentile was `9`. The runner-up `337.5` measured MAE `28.143`; the best idle frame measured MAE `48.959`.
 - The reply editor was closed immediately after capture, its toggle returned to `Off`, and no text was entered or submitted. This proves the installed package responds through one formal caret-look path; it does not claim that all 16 directions were individually triggered in computer-use mode or that every non-idle state was swept live.
 - Ignored evidence remains under `work/runs/kano--scarbal486-v2/qa/`, including settings, pet-window, frame-sampling, runtime-code, unlocked ordinary-mouse, and caret-look captures. The machine-readable caret result is `runtime-look-unlocked/runtime-look-input-qa.json`.
+
+### Smooth idle follow-up
+
+Status: 10 FPS idle playback and animated-package caret look passed on 2026-08-02
+
+- Root cause: Codex `26.721.11231.0` multiplies the six host idle durations by 6, producing `[1680, 660, 660, 840, 840, 1920] ms`. `pet.json` has no timing field. The Kano-only animated atlas advances the approved idle art independently at 100 ms per phase without modifying Codex resources or another pet.
+- Installed path: `C:\Users\W\.codex\pets\kano--scarbal486\spritesheet.webp`. Its SHA-256 equals `dist/spritesheet.webp` (`0E4D65565AD672FAA9D91262E4BE3A9B11524EE4F31AFF9FE1C17DB9E79F5296`); installed and packaged `pet.json` remain byte-identical at `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`.
+- Primary runtime sample: 70 captures over 3445 ms at an average 49.928 ms sampling interval. All six phases appeared in strict sequential order across 34 transitions. Complete measured dwell intervals were 92-114 ms, with 100.061 ms mean and 100 ms median. Best-match RGB MAE was 6.072-7.274 and no capture contained a pure-green pixel. No old 660-1920 ms stall occurred.
+- Visual inspection of the six-phase runtime contact sheet found the antlers, head, cape, and feet complete and unclipped in every phase. The accessibility node remained 113 x 122 and the auxiliary Codex window remained 408 x 400.
+- Reload persistence sample: after restoring the static A/B control, reinstalling the exact dynamic package, closing the pet window, refreshing Pets, and waking Kano again, 45 captures over 2198 ms contained all six phases in sequential order across 22 transitions. The measured dwell range was 47-154 ms under capture jitter, with 100.095 ms mean; no 660 ms stall or pure-green pixel appeared.
+- A fresh dynamic-package caret test used UI Automation to toggle the current notification's reply editor `On`, verified its empty `Edit` control held keyboard focus, and sent one `End` selection event. The pre-event frame matched idle; all 19 post-event captures matched look direction `337.5` from final atlas row 10, column 7. The representative frame compared 4,379 high-alpha pixels at RGB MAE `6.152`, median absolute channel error `0`, and 90th percentile `11`; the best idle control measured MAE `56.106`, a 9.120x separation.
+- The reply editor was closed immediately after the burst, its toggle returned to `Off`, its control disappeared, and draft length was `0` both before and after. No text was entered and no message was submitted. At capture time the installed atlas and manifest were byte-identical to `dist`, with SHA-256 `0E4D65565AD672FAA9D91262E4BE3A9B11524EE4F31AFF9FE1C17DB9E79F5296` and `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`.
+- A post-look idle sample then captured 70 frames over 3459 ms with the reply toggle still `Off` and the pet node still 113 x 122. All six phases appeared in strict sequential order across 35 transitions; complete dwell intervals were 78-118 ms with a 99.912 ms mean. Best-match RGB MAE was 6.040-7.269, no 660 ms stall occurred, and all captures contained 0 pure-green pixels. Visual review of its six-phase contact sheet again found the character complete and unclipped.
+- Ignored evidence is under `work/runs/kano--scarbal486-v2/qa/smooth-idle/runtime/`, including the static backup, primary, post-reload, and post-look timing captures, the six-phase runtime contact sheets, A/B caret controls, the fresh 20-frame dynamic live-look burst, `dynamic-live-look-qa.json`, and `idle-after-live-look-qa.json`.
 
 ## Release
 
