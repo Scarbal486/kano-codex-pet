@@ -79,7 +79,7 @@ Status: Passed
 
 ## Runtime smoke test
 
-Status: Selection, load, render, and idle-loop checks passed; unlocked pointer/state sweep pending
+Status: Selection, load, render, idle-loop, and caret-driven look checks passed; exhaustive live state sweep not performed
 
 - Installed to `C:\Users\W\.codex\pets\kano--scarbal486` on 2026-08-01. Installed `pet.json` and `spritesheet.webp` hashes exactly match `dist/`.
 - Tested application: Codex `26.721.11231.0` on Windows.
@@ -88,8 +88,11 @@ Status: Selection, load, render, and idle-loop checks passed; unlocked pointer/s
 - Runtime accessibility identified the rendered node as `鹿乃 / Kano 宠物` with a 113 x 122 on-screen bound, matching the configured 112 px mascot width. The rendered character was complete, not clipped, and had no pure-green pixels.
 - A 5.318-second runtime sample at approximately 10 Hz captured 50 window frames, 5 distinct pet frames, and 4 idle transitions. The observed transition intervals match Codex's fixed idle pacing.
 - Codex `26.721.11231.0` deliberately multiplies the idle-row dwell times by 6: `[1680, 660, 660, 840, 840, 1920] ms`. The slow idle impression is therefore host playback policy, not missing atlas frames or the 10 FPS direction-review GIF.
-- The Windows session was on the lock screen during the smoke test. UI Automation could select and wake the pet, but the secure desktop did not forward pointer motion to the user-desktop overlay. Pointer-look switching and a live trigger sweep of every non-idle state are therefore not claimed as passed.
-- Ignored evidence remains under `work/runs/kano--scarbal486-v2/qa/`, including settings, pet-window, frame-sampling, and runtime-code captures.
+- After unlocking Windows, a 16-point ordinary-mouse ring around the pet left the renderer on idle frames. Current Codex runtime code confirms that this is the expected input model: ordinary overlay pointer events drive drag and interaction behavior, while look frames consume `avatar-overlay-computer-use-cursor-changed` or a notification reply editor's `caretPoint`.
+- Merely opening an empty reply editor initializes `caretPoint` to `null`; the first capture from that state matched `idle-0`, so it is retained as a negative control rather than look evidence.
+- With the reply draft still empty, an `End` selection event caused the editor's `onSelect` path to publish a caret point. A fresh 113 x 122 capture then matched look direction `315` from final atlas row 10, column 6: on 4,413 high-alpha pixels, RGB MAE was `5.359`, median absolute channel error was `0`, and the 90th percentile was `9`. The runner-up `337.5` measured MAE `28.143`; the best idle frame measured MAE `48.959`.
+- The reply editor was closed immediately after capture, its toggle returned to `Off`, and no text was entered or submitted. This proves the installed package responds through one formal caret-look path; it does not claim that all 16 directions were individually triggered in computer-use mode or that every non-idle state was swept live.
+- Ignored evidence remains under `work/runs/kano--scarbal486-v2/qa/`, including settings, pet-window, frame-sampling, runtime-code, unlocked ordinary-mouse, and caret-look captures. The machine-readable caret result is `runtime-look-unlocked/runtime-look-input-qa.json`.
 
 ## Release
 
