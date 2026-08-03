@@ -10,6 +10,20 @@
 
 已确认的图集预览、方向检查和动画预览位于 `assets/`。
 
+### 角色立绘
+
+<p align="center">
+  <img src="assets/model-sheet.png" alt="鹿乃 Codex 宠物角色立绘" width="360">
+</p>
+
+### 动作总览
+
+![鹿乃 Codex 宠物动作总览](assets/contact-sheet.png)
+
+### 16 向观察
+
+![鹿乃 Codex 宠物 16 向观察预览](assets/look-directions.png)
+
 ## 安装
 
 可安装文件位于 `dist/`。将 `pet.json` 和 `spritesheet.webp` 复制到：
