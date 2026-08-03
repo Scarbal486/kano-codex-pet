@@ -1,55 +1,55 @@
-# Kano Codex Pet
+# 鹿乃 Codex 宠物
 
-## About
+## 项目介绍
 
-This repository contains an unofficial, fan-made Codex Pet v2 based on Kano's classic antler-girl avatar. The visual target is the rounded chibi sticker style shown by the local production references.
+这是一个以鹿乃经典鹿角少女形象为原型制作的非官方 Codex Pet v2。角色采用圆润的 Q 版贴纸风格，具体造型以本地制作参考为准。
 
-The repository remains private during production. It must not be made public until a separate source-and-rights review is complete.
+仓库在制作期间保持私有。完成素材来源与权利审查前，不得公开发布。
 
-## Preview
+## 预览
 
-Approved contact sheets, direction checks, and animation previews are under `assets/`.
+已确认的图集预览、方向检查和动画预览位于 `assets/`。
 
-## Install
+## 安装
 
-The installable files are under `dist/`. Copy `pet.json` and `spritesheet.webp` to:
+可安装文件位于 `dist/`。将 `pet.json` 和 `spritesheet.webp` 复制到：
 
 ```text
 %USERPROFILE%\.codex\pets\kano--scarbal486\
 ```
 
-Then refresh or restart Codex and select `鹿乃 / Kano` in Settings -> Pets.
+然后刷新或重启 Codex，在 Settings -> Pets 中选择 `鹿乃 / Kano`。
 
-On Codex `26.721.11231.0`, the tested flow is:
+在 Codex `26.721.11231.0` 中，已验证的操作流程如下：
 
-1. Open Settings -> Pets.
-2. Use Refresh if the custom entry is not visible yet.
-3. Select `鹿乃 / Kano`.
-4. Choose Wake pet.
+1. 打开 Settings -> Pets。
+2. 如果列表中没有自定义宠物，点击 Refresh。
+3. 选择 `鹿乃 / Kano`。
+4. 点击 Wake pet。
 
-The package was installed and selected successfully on Windows on 2026-08-01. The runtime atlas was updated on 2026-08-03 to a lossless six-phase animated WebP with exact phase durations `[100, 4600, 100, 100, 100, 100] ms`, infinite looping, a 5.1-second blink cycle, and an approximately 11.8 blinks-per-minute cadence. The approved frame order and artwork are unchanged.
+该宠物已于 2026-08-01 在 Windows 上完成安装与启用验证。运行图集于 2026-08-03 更新为无损六相位动态 WebP，各相位时长精确为 `[100, 4600, 100, 100, 100, 100] ms`，无限循环。完整眨眼周期为 5.1 秒，约每分钟 11.8 次。已确认的帧顺序和画面内容均未改变。
 
-The same deterministic build registers the complete working row at 92% scale against its original foot baseline and the complete jumping row at 115% scale while keeping every sprite inside its cell and retaining the approved jump trajectory. All other state rows, the neutral cell, and all 16 look directions remain pixel-identical to the approved static atlas.
+同一套确定性构建流程会把 working 完整行缩放到 92%，并保持原脚底基线；jumping 完整行缩放到 115%，所有精灵仍位于各自单元格内，跳跃轨迹保持不变。其他状态行、neutral 单元和 16 个观察方向均与已确认的静态图集逐像素一致。
 
-This update changes only Kano's custom `spritesheet.webp`. It does not patch Codex, change another pet, add a timing setting to `pet.json`, or modify pointer and drag behavior. A fresh Codex `26.727.6591.0` runtime sample observed two complete idle cycles at `5100 ms` and `5099 ms`; the user also visually accepted the adjusted working and jumping playback.
+本次更新只修改鹿乃宠物的 `spritesheet.webp`，不会补丁修改 Codex、影响其他宠物、向 `pet.json` 添加计时设置，也不会改变鼠标点击或拖动行为。在 Codex `26.727.6591.0` 中重新采样后，两个完整 idle 周期分别为 `5100 ms` 和 `5099 ms`；调整后的 working 与 jumping 动画也已通过目视确认。
 
-## Package
+## 包内容
 
-The runtime package contains only:
+运行时只需要以下文件：
 
 - `dist/pet.json`
 - `dist/spritesheet.webp`
 
-`dist/validation.json` records deterministic atlas validation and is not required at runtime.
+`dist/validation.json` 记录确定性图集验证结果，运行时不需要此文件。
 
-## Development
+## 开发说明
 
-The pet targets Codex Pet v2: an 8 x 11 atlas with 192 x 208 cells, for a final size of 1536 x 2288. Local reference stickers and intermediate production files are intentionally excluded from Git.
+本宠物使用 Codex Pet v2 规格：图集为 8 x 11，每个单元格为 192 x 208，最终尺寸为 1536 x 2288。本地参考贴纸和制作过程中的中间文件不会提交到 Git。
 
-## Sources and rights
+## 素材来源与权利说明
 
-See `docs/sources-and-rights.md` and `NOTICE.md`. The original sticker references remain local and are not distributed by this repository.
+详见 `docs/sources-and-rights.md` 和 `NOTICE.md`。原始贴纸参考仅保存在本地，不随本仓库分发。
 
-## Non-official project
+## 非官方项目
 
-This project is not affiliated with or endorsed by Kano, her management, OpenAI, or the creators and distributors of the reference stickers.
+本项目与鹿乃本人、其管理团队、OpenAI，以及参考贴纸的创作者和发行方均无关联，也未获得上述各方背书。
