@@ -70,13 +70,13 @@ Status: Approved
 Status: Passed
 
 - The single authorized chroma-despill pass completed with `ok: true`, preserved alpha, changed 130752 pixels, and rejected 0 pixels. No second despill pass was run.
-- Final package atlas: `dist/spritesheet.webp`, lossless animated WebP RGBA, 1536 x 2288, 8 columns x 11 rows, 192 x 208 cells, Codex Pet v2. The file is 2550320 bytes and contains 6 animation frames, each with a 100 ms duration, at 10 FPS with infinite loop value `0`.
-- Deterministic animation validation passed with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels. At animation phase `p`, idle columns 0 through 5 all decode to approved idle source cell `p`; neutral and unused cells and every non-idle row remain pixel-identical to the approved static atlas.
+- Final package atlas: `dist/spritesheet.webp`, lossless animated WebP RGBA, 1536 x 2288, 8 columns x 11 rows, 192 x 208 cells, Codex Pet v2. The file is 2567128 bytes and contains 6 animation frames with exact durations `[100, 4600, 100, 100, 100, 100] ms`, a 5100 ms cycle, and infinite loop value `0`.
+- Deterministic animation validation passed with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels. At animation phase `p`, idle columns 0 through 5 all decode to approved idle source cell `p`. The complete working row is registered at 92% scale against foot baseline `y=203`; the complete jumping row is registered at 115% scale with the approved top/ground clamps. Neutral and unused cells, every other state row, and both 16-direction look rows remain pixel-identical to the approved static atlas.
 - All six decoded phases independently passed `validate_atlas.py --require-v2`: each is 1536 x 2288 with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels.
 - Manifest: `dist/pet.json`; validation report: `dist/validation.json`; final visual audit sheet: `assets/contact-sheet.png`.
 - SHA-256 `dist/pet.json`: `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`.
-- SHA-256 `dist/spritesheet.webp`: `0E4D65565AD672FAA9D91262E4BE3A9B11524EE4F31AFF9FE1C17DB9E79F5296`.
-- SHA-256 `dist/validation.json`: `BB1F32D503A62AB808DC27E77DCE3CB2130BDF815E1B6ECA0AA1AD243ABE8F13`.
+- SHA-256 `dist/spritesheet.webp`: `FFDFD6ACDB3D607F0186E3E7F8F234CC00FBA8E9249061A2F79AEA50E9945C39`.
+- SHA-256 `dist/validation.json`: `B468F640FE5BCDB3B4459C5CB0328FBE172BD86FAF8B53A635D81CE52BC417D5`.
 
 ## Runtime smoke test
 
@@ -108,6 +108,17 @@ Status: 10 FPS idle playback and animated-package caret look passed on 2026-08-0
 - The reply editor was closed immediately after the burst, its toggle returned to `Off`, its control disappeared, and draft length was `0` both before and after. No text was entered and no message was submitted. At capture time the installed atlas and manifest were byte-identical to `dist`, with SHA-256 `0E4D65565AD672FAA9D91262E4BE3A9B11524EE4F31AFF9FE1C17DB9E79F5296` and `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`.
 - A post-look idle sample then captured 70 frames over 3459 ms with the reply toggle still `Off` and the pet node still 113 x 122. All six phases appeared in strict sequential order across 35 transitions; complete dwell intervals were 78-118 ms with a 99.912 ms mean. Best-match RGB MAE was 6.040-7.269, no 660 ms stall occurred, and all captures contained 0 pure-green pixels. Visual review of its six-phase contact sheet again found the character complete and unclipped.
 - Ignored evidence is under `work/runs/kano--scarbal486-v2/qa/smooth-idle/runtime/`, including the static backup, primary, post-reload, and post-look timing captures, the six-phase runtime contact sheets, A/B caret controls, the fresh 20-frame dynamic live-look burst, `dynamic-live-look-qa.json`, and `idle-after-live-look-qa.json`.
+
+### Calm blink and balanced scale follow-up
+
+Status: Package validation, installation, two-cycle idle timing, and user visual scale review passed on 2026-08-03
+
+- Approved rhythm C uses exact phase durations `[100, 4600, 100, 100, 100, 100] ms`, a 5100 ms cycle, and approximately 11.8 blinks per minute. Approved scale profile B registers the complete working row at 92% and the complete jumping row at 115%; no frame was regenerated, reordered, patched, mirrored, or mixed.
+- The approved static source is `work/runs/kano--scarbal486-v2/final/spritesheet-extended.png`, SHA-256 `82EC639F925DF84E96B5AA91E478B17365DDE08662542079842AD6499541DEC6`. Candidate and packaged animated atlases are byte-identical at SHA-256 `FFDFD6ACDB3D607F0186E3E7F8F234CC00FBA8E9249061A2F79AEA50E9945C39`.
+- The installed atlas at `C:\Users\W\.codex\pets\kano--scarbal486\spritesheet.webp` is byte-identical to `dist/spritesheet.webp`; installed and packaged `pet.json` remain byte-identical at SHA-256 `CBCEDA7DDE77A114440C5CE572CEAFEF1E822E84C18C12A422642BEA77C2F686`. The prior installed package was backed up under ignored `work/runs/kano--scarbal486-v2/qa/smooth-idle-scale/runtime/` before replacement.
+- On Codex `26.727.6591.0`, a fresh 18.150-second sample captured 364 frames at a 50 ms target interval. All six phases appeared in strict sequential order. Two complete cycles measured `5100 ms` and `5099 ms`; complete phase-1 dwells measured `4600 ms` and `4601 ms`, and complete short-phase dwells measured `95-106 ms`. All captures contained 0 pure-green pixels.
+- The user visually accepted the adjusted working and jumping playback. Candidate cells for all six working frames and all five jumping frames are byte-identical to the approved balanced previews; working alpha bounds end at `y=203`, and all enlarged jumping sprites remain complete within their 192 x 208 cells.
+- Focused tests passed 5/5, the upstream suite passed 28/28, and all six decoded output phases passed the upstream validator with 0 errors, 0 warnings, and 0 transparent-RGB residue pixels. Ignored reports and captures are under `work/runs/kano--scarbal486-v2/qa/smooth-idle-scale/`.
 
 ## Release
 

@@ -11,19 +11,21 @@
   "frame_count": 6,
   "durations_ms": [
     100,
-    100,
+    4600,
     100,
     100,
     100,
     100
   ],
-  "fps": 10,
+  "cycle_duration_ms": 5100,
   "loop": 0,
   "transparent_rgb_residue_pixels": 0,
   "preservation": {
     "idle_phase_mapping": "passed",
     "neutral_and_unused_cells": "pixel-identical",
-    "non_idle_rows": "pixel-identical"
+    "non_target_rows": "pixel-identical",
+    "working_scale": 0.92,
+    "jumping_scale": 1.15
   },
   "errors": [],
   "warnings": []

@@ -27,9 +27,11 @@ On Codex `26.721.11231.0`, the tested flow is:
 3. Select `鹿乃 / Kano`.
 4. Choose Wake pet.
 
-The package was installed and selected successfully on Windows on 2026-08-01. The runtime atlas was updated on 2026-08-02 to a lossless six-phase animated WebP: each phase lasts 100 ms, so Kano's approved idle loop renders at 10 FPS even though Codex `26.721.11231.0` gives the host-selected idle columns long dwell times.
+The package was installed and selected successfully on Windows on 2026-08-01. The runtime atlas was updated on 2026-08-03 to a lossless six-phase animated WebP with exact phase durations `[100, 4600, 100, 100, 100, 100] ms`, infinite looping, a 5.1-second blink cycle, and an approximately 11.8 blinks-per-minute cadence. The approved frame order and artwork are unchanged.
 
-This playback fix changes only Kano's custom `spritesheet.webp`. It does not patch Codex, change another pet, or add a timing setting to `pet.json`. A fresh empty-reply `End` caret test also confirmed that the animated atlas still switches to Kano's approved look row without entering or submitting text.
+The same deterministic build registers the complete working row at 92% scale against its original foot baseline and the complete jumping row at 115% scale while keeping every sprite inside its cell and retaining the approved jump trajectory. All other state rows, the neutral cell, and all 16 look directions remain pixel-identical to the approved static atlas.
+
+This update changes only Kano's custom `spritesheet.webp`. It does not patch Codex, change another pet, add a timing setting to `pet.json`, or modify pointer and drag behavior. A fresh Codex `26.727.6591.0` runtime sample observed two complete idle cycles at `5100 ms` and `5099 ms`; the user also visually accepted the adjusted working and jumping playback.
 
 ## Package
 

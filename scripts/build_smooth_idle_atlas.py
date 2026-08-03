@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and validate a 10 FPS animated idle atlas for a Codex Pet v2."""
+"""Build and validate Kano's animated atlas for a Codex Pet v2."""
 
 from __future__ import annotations
 
@@ -18,7 +18,12 @@ ATLAS_HEIGHT = 2288
 CELL_WIDTH = 192
 CELL_HEIGHT = 208
 IDLE_FRAME_COUNT = 6
-FRAME_DURATION_MS = 100
+FRAME_DURATIONS_MS = (100, 4600, 100, 100, 100, 100)
+JUMPING_ROW = 4
+WORKING_ROW = 7
+GROUND_BOTTOM = 203
+TOP_MARGIN = 5
+STATE_SCALES = {"working": 0.92, "jumping": 1.15}
 
 
 class AtlasError(ValueError):
@@ -87,17 +92,22 @@ def _animation_frame_chunk(image: Image.Image, duration_ms: int) -> bytes:
 
 
 def _save_exact_animation(frames: list[Image.Image], path: Path) -> None:
+    if len(frames) != len(FRAME_DURATIONS_MS):
+        raise AtlasError(
+            f"animation must contain {len(FRAME_DURATIONS_MS)} frames, "
+            f"got {len(frames)}"
+        )
     vp8x = b"\x12\0\0\0" + _uint24(ATLAS_WIDTH - 1) + _uint24(
         ATLAS_HEIGHT - 1
     )
     anim = b"\0\0\0\0\0\0"
-    frame_chunks = [_animation_frame_chunk(frames[0], FRAME_DURATION_MS)]
+    frame_chunks = [_animation_frame_chunk(frames[0], FRAME_DURATIONS_MS[0])]
     frame_chunks.extend(
         _animation_frame_chunk(
             frame.crop((0, 0, ATLAS_WIDTH, CELL_HEIGHT)),
-            FRAME_DURATION_MS,
+            FRAME_DURATIONS_MS[phase],
         )
-        for frame in frames[1:]
+        for phase, frame in enumerate(frames[1:], start=1)
     )
     body = b"WEBP" + _riff_chunk(b"VP8X", vp8x) + _riff_chunk(b"ANIM", anim)
     body += b"".join(frame_chunks)
@@ -168,10 +178,51 @@ def _load_static_source(source_path: Path) -> Image.Image:
     return source
 
 
+def _scale_cell(image: Image.Image, scale: float, state: str) -> Image.Image:
+    bbox = image.getchannel("A").getbbox()
+    if bbox is None:
+        return image.copy()
+
+    _, _, _, bottom = bbox
+    sprite = image.crop(bbox)
+    width = round(sprite.width * scale)
+    height = round(sprite.height * scale)
+    sprite = sprite.resize((width, height), Image.Resampling.LANCZOS)
+
+    x = round(CELL_WIDTH / 2 - width / 2)
+    if state == "working":
+        y = GROUND_BOTTOM - height
+    else:
+        y = bottom - height
+        y = max(TOP_MARGIN, min(y, GROUND_BOTTOM - height))
+
+    result = Image.new("RGBA", (CELL_WIDTH, CELL_HEIGHT), (0, 0, 0, 0))
+    result.alpha_composite(sprite, (x, y))
+    return result
+
+
+def _apply_state_scales(source: Image.Image) -> Image.Image:
+    scaled = source.copy()
+    for row, state in ((WORKING_ROW, "working"), (JUMPING_ROW, "jumping")):
+        for column in range(ATLAS_WIDTH // CELL_WIDTH):
+            box = (
+                column * CELL_WIDTH,
+                row * CELL_HEIGHT,
+                (column + 1) * CELL_WIDTH,
+                (row + 1) * CELL_HEIGHT,
+            )
+            cell = source.crop(box)
+            if cell.getchannel("A").getbbox() is None:
+                continue
+            scaled.paste(_scale_cell(cell, STATE_SCALES[state], state), box[:2])
+    return scaled
+
+
 def _build_frames(source: Image.Image) -> list[Image.Image]:
+    scaled_source = _apply_state_scales(source)
     frames: list[Image.Image] = []
     for phase in range(IDLE_FRAME_COUNT):
-        frame = source.copy()
+        frame = scaled_source.copy()
         idle = source.crop(
             (
                 phase * CELL_WIDTH,
@@ -188,7 +239,7 @@ def _build_frames(source: Image.Image) -> list[Image.Image]:
 
 def _validate_output(path: Path, source: Image.Image) -> dict[str, object]:
     metadata = inspect_animated_webp(path)
-    expected_durations = [FRAME_DURATION_MS] * IDLE_FRAME_COUNT
+    expected_durations = list(FRAME_DURATIONS_MS)
     if not metadata["animation"]:
         raise AtlasError("output WebP is not animated")
     if metadata["loop"] != 0:
@@ -199,19 +250,29 @@ def _validate_output(path: Path, source: Image.Image) -> dict[str, object]:
             f"got {metadata['durations_ms']}"
         )
 
-    neutral_and_unused = source.crop(
+    expected_static = _apply_state_scales(source)
+    for row in range(1, ATLAS_HEIGHT // CELL_HEIGHT):
+        if row in {JUMPING_ROW, WORKING_ROW}:
+            continue
+        box = (0, row * CELL_HEIGHT, ATLAS_WIDTH, (row + 1) * CELL_HEIGHT)
+        if _difference_bbox(expected_static.crop(box), source.crop(box)) is not None:
+            raise AtlasError(f"state scaling changed non-target row {row}")
+
+    neutral_and_unused = expected_static.crop(
         (IDLE_FRAME_COUNT * CELL_WIDTH, 0, ATLAS_WIDTH, CELL_HEIGHT)
     )
-    non_idle = source.crop((0, CELL_HEIGHT, ATLAS_WIDTH, ATLAS_HEIGHT))
+    expected_non_idle = expected_static.crop(
+        (0, CELL_HEIGHT, ATLAS_WIDTH, ATLAS_HEIGHT)
+    )
     frame_count = 0
     residue_counts: list[int] = []
     try:
         with Image.open(path) as opened:
             if not getattr(opened, "is_animated", False):
                 raise AtlasError("decoded output is not animated")
-            if opened.n_frames != IDLE_FRAME_COUNT:
+            if opened.n_frames != len(FRAME_DURATIONS_MS):
                 raise AtlasError(
-                    f"decoded output must have {IDLE_FRAME_COUNT} frames, "
+                    f"decoded output must have {len(FRAME_DURATIONS_MS)} frames, "
                     f"got {opened.n_frames}"
                 )
             for phase, decoded in enumerate(ImageSequence.Iterator(opened)):
@@ -250,7 +311,7 @@ def _validate_output(path: Path, source: Image.Image) -> dict[str, object]:
                     )
                 if _difference_bbox(
                     frame.crop((0, CELL_HEIGHT, ATLAS_WIDTH, ATLAS_HEIGHT)),
-                    non_idle,
+                    expected_non_idle,
                 ) is not None:
                     raise AtlasError(f"decoded phase {phase} changed non-idle rows")
                 residue_counts.append(_transparent_rgb_residue_count(frame))
@@ -277,13 +338,15 @@ def _validate_output(path: Path, source: Image.Image) -> dict[str, object]:
         "height": ATLAS_HEIGHT,
         "frame_count": frame_count,
         "durations_ms": expected_durations,
-        "fps": 1000 // FRAME_DURATION_MS,
+        "cycle_duration_ms": sum(FRAME_DURATIONS_MS),
         "loop": metadata["loop"],
         "transparent_rgb_residue_pixels": max(residue_counts, default=0),
         "preservation": {
             "idle_phase_mapping": "passed",
             "neutral_and_unused_cells": "pixel-identical",
-            "non_idle_rows": "pixel-identical",
+            "non_target_rows": "pixel-identical",
+            "working_scale": STATE_SCALES["working"],
+            "jumping_scale": STATE_SCALES["jumping"],
         },
         "errors": [],
         "warnings": [],
